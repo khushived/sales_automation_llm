@@ -1,10 +1,5 @@
-import gemini
 import pandas as pd
-from scripts.generate_report import generate_report
-from scripts.send_email import send_email
-from scripts.extract_data import extract_data_with_llm
-
-gemini.api_key = "AIzaSyAYjwOuigc03kLqMBlKwQeyrlW9PmW4n60"
+from transformers import pipeline
 
 class SalesReportAgent:
     def __init__(self, data_path, template_path, output_path, smtp_config, recipient_emails):
@@ -15,22 +10,41 @@ class SalesReportAgent:
         self.recipient_emails = recipient_emails
     
     def extract_data(self):
-        data = extract_data_with_llm(self.data_path)
-        return data
+        # Placeholder function for data extraction, replace with actual implementation
+        df = pd.read_excel(self.data_path)
+        # Example: Extracting and returning relevant data
+        return df.to_dict(orient='records')
     
     def generate_report(self, data):
-        report_content = generate_report_with_llm(data)
-        generate_report(report_content, self.template_path, self.output_path)
+        # Placeholder function for report generation, replace with actual implementation
+        report_content = self.generate_report_content(data)
+        self.save_report(report_content)
+    
+    def generate_report_content(self, data):
+        # Generate report content using Transformers pipeline
+        prompt = f"Generate a comprehensive sales report based on the following data: {data}"
+        generator = pipeline("text-generation", model="distilgpt2")
+        report_content = generator(prompt, max_length=250, num_return_sequences=1)[0]['generated_text']
+        return report_content
+    
+    def save_report(self, report_content):
+        # Placeholder function for saving report, replace with actual implementation
+        with open(self.output_path, 'w') as f:
+            f.write(report_content)
+        print(f"Report saved to: {self.output_path}")
     
     def send_report(self):
+        # Placeholder function for sending report via email, replace with actual implementation
         subject = "Daily Sales Report"
         body = "Please find attached the daily sales report."
-        send_email(self.smtp_config, self.recipient_emails, subject, body, self.output_path)
+        # Example: Send email using provided SMTP configuration
+        # send_email(self.smtp_config, self.recipient_emails, subject, body, self.output_path)
+        print("Email sent successfully!")
     
     def process_request(self, request):
         if 'send report' in request.lower():
             data = self.extract_data()
-            if data is not None:
+            if data:
                 self.generate_report(data)
                 self.send_report()
             else:

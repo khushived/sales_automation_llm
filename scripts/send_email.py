@@ -1,28 +1,22 @@
-import gemini
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-from email.mime.text import MIMEText
+from transformers import pipeline
 
-gemini.api_key = "AIzaSyAYjwOuigc03kLqMBlKwQeyrlW9PmW4n60"
-
-def generate_email_content_with_gemini(data):
-    """Generates email subject and body using Gemini LLM."""
+def generate_email_content_with_transformers(data):
+    """Generates email subject and body using Transformers LLM."""
     prompt = f"Generate a comprehensive sales email based on the following data: {data}"
-    response = gemini.ChatCompletion.create(
-        model="gemini-llm",  # Choose an appropriate Gemini LLM model
-        messages=[
-            {"role": "system", "content": "You are an expert email writer."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    email_content = response.choices[0].text
+
+    # Initialize the transformer pipeline for text generation
+    model_name = "distilgpt2"  # Example model, you can choose based on your needs
+    generator = pipeline("text-generation", model=model_name)
+
+    # Generate email content based on the prompt
+    email_content = generator(prompt, max_length=200, num_return_sequences=1)[0]['generated_text']
     subject, body = email_content.split('\n', 1)
+    
     return subject.strip(), body.strip()
 
 def send_email(smtp_config, recipient_emails, data, attachment_path):
     try:
-        subject, body = generate_email_content_with_gemini(data)
+        subject, body = generate_email_content_with_transformers(data)
 
         msg = MIMEMultipart()
         msg['From'] = smtp_config['sender_email']

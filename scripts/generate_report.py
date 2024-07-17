@@ -1,16 +1,14 @@
-import gemini
-
-gemini.api_key = "AIzaSyAYjwOuigc03kLqMBlKwQeyrlW9PmW4n60"
+from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
 
 def generate_report_with_llm(data):
     """Generates a report using an LLM to create human-readable content."""
     prompt = f"Generate a comprehensive sales report based on the following data: {data}"
-    response = gemini.ChatCompletion.create(
-        model="gemini-llm",  # Choose an appropriate Gemini LLM model
-        messages=[
-            {"role": "system", "content": "You are an expert report writer."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    report_content = response.choices[0].text
+
+    # Initialize the transformer pipeline for text generation
+    model_name = "distilgpt2"  # Example model, you can choose based on your needs
+    generator = pipeline("text-generation", model=model_name)
+
+    # Generate report content based on the prompt
+    report_content = generator(prompt, max_length=250, num_return_sequences=1)[0]['generated_text']
+    
     return report_content

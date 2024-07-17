@@ -7,7 +7,7 @@ smtp_config = {
     'sender_password': 'heyther@87'
 }
 
-recipient_emails = ['manager1@example.com']
+recipient_emails = ['khushived6@gmail.com']
 
 agent = SalesReportAgent(
     data_path='data/sales_data.xlsx',
